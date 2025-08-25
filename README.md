@@ -1,2 +1,2 @@
 # Lectura Digital
-![logo-LecturDigital](../Logo/Logo3-1.png)
+![logo-LecturDigital](../Logo/Logo.png)
