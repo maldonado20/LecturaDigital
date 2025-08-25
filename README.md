@@ -1,2 +1,2 @@
 # Lectura Digital
-!![Logo](Logo/Logo3-1.png)
+!![Logo](../Logo/Logo3-1.png)
