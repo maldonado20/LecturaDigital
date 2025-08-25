@@ -1,2 +1,2 @@
 # Lectura Digital
-!![Logo]([../Logo/Logo3-1.png](https://github.com/maldonado20/LecturaDigital/blob/main/Logo/Logo%203-1.png))
+![logo-LecturDigital](https://github.com/GR230806/Proyecto_de_Catedra/assets/124802181/2f2e8fa4-58b0-4763-bb2d-1cd66b1165b2)
