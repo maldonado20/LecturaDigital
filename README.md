@@ -1,2 +1,2 @@
 # Lectura Digital
-<img src="Logo/Logo.png" alt="LogoLecturaDigital" wdth="200" height="100">
+<img src="Logo/Logo.png" alt="LogoLecturaDigital" wdth="300" height="150">
