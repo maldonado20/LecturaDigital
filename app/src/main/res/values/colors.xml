@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="white">#ffffff</color>
-    <color name="black">#000000"</color>
+    <color name="black">#000000</color>
     <color name="nav">#1e3a76</color>
     <color name="buttom1">#2a5a9d</color>
     <color name="buttom2">#4a8ebf</color>
