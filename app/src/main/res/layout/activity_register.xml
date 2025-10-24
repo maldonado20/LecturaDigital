@@ -104,7 +104,7 @@
             android:layout_height="60dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/borde_primer_boton"
-            android:text="CREAR CUENTA"
+            android:text="@string/login_register_hin"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:backgroundTint="@null" />

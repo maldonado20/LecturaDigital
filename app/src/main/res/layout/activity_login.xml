@@ -79,7 +79,7 @@
             android:layout_height="60dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/borde_primer_boton"
-            android:text="INICIAR SESION"
+            android:text="@string/login_hin"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:backgroundTint="@null" />
@@ -91,7 +91,7 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/borde_segundo_boton"
             app:backgroundTint="@null"
-            android:text="CREAR CUENTA"
+            android:text="@string/login_register_hin"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
