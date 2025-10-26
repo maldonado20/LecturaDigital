@@ -3,6 +3,7 @@ package com.dsm441.lecturadigital
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
@@ -20,6 +21,8 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var etPasswordLogin: TextInputEditText
     private lateinit var btnLogin: Button
     private lateinit var btnGoToRegister: Button
+    private lateinit var tvForgotPassword: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -31,8 +34,9 @@ class LoginActivity : AppCompatActivity() {
         etPasswordLogin = findViewById(R.id.etPasswordLogin)
         btnLogin = findViewById(R.id.btnLogin)
         btnGoToRegister = findViewById(R.id.btnRegister)
+        tvForgotPassword = findViewById(R.id.tvForgotPassword)
 
-        // 5. Configurar el Click Listener para el botón de Login
+        // Configurar el Click Listener para el botón de Login
         btnLogin.setOnClickListener {
             loginUser()
         }
@@ -42,6 +46,31 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
+
+        //El click listener para el boton de recuperar contraseña
+        tvForgotPassword.setOnClickListener {
+            sendPasswordReset()
+        }
+    }
+
+    //Funcion para enviar el correo de recuperacion de contra
+    private fun sendPasswordReset(){
+        val email = etEmailLogin.text.toString().trim()
+
+
+        if (email.isBlank()) {
+            Toast.makeText(this, "Introduce tu email para restablecer la contraseña", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "Correo electrónico de recuperación de contraseña enviado, por favor revise su bandeja de entrada", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
 
