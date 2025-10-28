@@ -15,4 +15,5 @@
     <string name="register_has_account_text">¿Ya tienes cuenta? Inicia Sesión</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="description_not_available">Descripción no disponible</string>
 </resources>

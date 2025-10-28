@@ -43,7 +43,8 @@ class LoginActivity : AppCompatActivity() {
 
         // para que el boton vaya a RegisterActivity
         btnGoToRegister.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
+            intent.putExtra("IS_LOGGED_IN", true)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }
 
