@@ -7,10 +7,12 @@
     <string name="login_no_account_text">¿No tienes cuenta? Regístrate aquí</string>
     <string name="logo_description">Logo de Lectura Digital</string>
     <string name="login_email_hint">Correo Electrónico</string>
-    <string name="login_hin">INICIAR SECCIÓN</string>
+    <string name="login_hin">INICIAR SESIÓN</string>
     <string name="login_register_hin">CREAR CUENTA</string>
     //Strings de Register
     <string name="register_confirm_password_hint">Confirmar Contraseña</string>
     <string name="register_button_text">Crear Cuenta</string>
     <string name="register_has_account_text">¿Ya tienes cuenta? Inicia Sesión</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
