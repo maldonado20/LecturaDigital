@@ -1,0 +1,19 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.LecturaDigital" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Hace que la barra de estado sea transparente -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <!-- Hace que la barra de navegación (abajo) también sea transparente -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+        <!-- Permite que la app dibuje debajo de las barras del sistema -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+
+    </style>
+
+    <style name="Theme.LecturaDigital" parent="Base.Theme.LecturaDigital" />
+</resources>
