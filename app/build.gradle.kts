@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
-    id("org.jetbrains.kotlin.plugin.parcelize")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -59,8 +59,6 @@ dependencies {
 
     //Librería de imagenes
     implementation("io.coil-kt:coil:2.6.0")
-
-
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

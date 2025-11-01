@@ -14,7 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LecturaDigital">
         <activity
-            android:name=".DetailActivity"
+            android:name=".PdfViewerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DetailActiviy"
             android:exported="false" />
         <activity
             android:name=".HomeActivity"
@@ -34,12 +37,7 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".PdfViewerActivity"
-            android:exported="false">
-        </activity>
+            android:exported="true"></activity>
     </application>
 
 </manifest>

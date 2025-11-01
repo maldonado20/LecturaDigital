@@ -43,9 +43,8 @@ class LoginActivity : AppCompatActivity() {
 
         // para que el boton vaya a RegisterActivity
         btnGoToRegister.setOnClickListener {
-            intent.putExtra("IS_LOGGED_IN", true)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            val intent_register = Intent(this, RegisterActivity::class.java)
+            startActivity(intent_register)
         }
 
         //El click listener para el boton de recuperar contraseña
