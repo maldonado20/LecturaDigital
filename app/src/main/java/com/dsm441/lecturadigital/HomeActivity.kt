@@ -1,98 +1,120 @@
 package com.dsm441.lecturadigital
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.dsm441.lecturadigital.data.LibroFirestore
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import com.dsm441.lecturadigital.HomeFragment
-import com.dsm441.lecturadigital.LoggedInHomeFragment
 
 
 class HomeActivity : AppCompatActivity() {
 
-    // --- FIX: Declarar 'auth' como miembro de la clase ---
     private lateinit var auth: FirebaseAuth
+    private val homeFragment: HomeFragment by lazy { HomeFragment() }
+    private val loggedInHomeFragment: LoggedInHomeFragment by lazy { LoggedInHomeFragment() }
+    private val profileFragment: ProfileFragment by lazy { ProfileFragment() }
+
+    private lateinit var activeFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
-        // --- FIX: Inicializar 'auth' aquí ---
         auth = Firebase.auth
 
         if (savedInstanceState == null) {
-            // Verificamos si el Intent trae la señal de login O si ya hay un usuario logueado
-            val isLoggedInIntent = intent.getBooleanExtra("IS_LOGGED_IN", false)
-            val isLoggedInAuth = auth.currentUser != null // Comprobamos directamente
+            val isLoggedIn = auth.currentUser != null
+            val initialFragment: Fragment
 
-            val initialFragment: Fragment = if (isLoggedInIntent || isLoggedInAuth) {
-                // Si viene del login O ya había sesión, cargamos el fragmento logueado
-                LoggedInHomeFragment()
+            val isLoggedInIntent = intent.getBooleanExtra("IS_LOGGED_IN", false)
+
+            val bookToShow = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra("BOOK_TO_SHOW", LibroFirestore::class.java)
             } else {
-                // Si no, cargamos el original
-                HomeFragment()
+                @Suppress("DEPRECATION")
+                // FIX: Cambiado 'BookItem' por 'Book'
+                intent.getParcelableExtra<LibroFirestore>("BOOK_TO_SHOW")
             }
 
-            // Cargamos el fragmento decidido
+            // (Ver "¡Ojo con este bug!" abajo)
+
+            if (isLoggedIn || isLoggedInIntent) { // <-- Lógica de login mejorada
+                if (bookToShow != null) {
+                    loggedInHomeFragment.arguments = Bundle().apply {
+                        // Esta línea ahora funciona
+                        putParcelable("FEATURED_BOOK", bookToShow)
+                    }
+                }
+                initialFragment = loggedInHomeFragment
+            } else {
+                initialFragment = homeFragment
+            }
+
+            activeFragment = initialFragment
+
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, initialFragment)
+                .add(R.id.fragment_container, initialFragment, "home")
                 .commit()
         }
 
-        // Llamamos a la configuración de la BottomNavigationView
         setupBottomNavigation()
     }
 
     private fun setupBottomNavigation() {
-        // No es necesario declarar 'auth' aquí de nuevo
         val bottomNavView: BottomNavigationView = findViewById(R.id.bottom_navigation)
 
         bottomNavView.setOnItemSelectedListener { item ->
-            var selectedFragment: Fragment? = null
-            // Usamos la variable 'auth' de la clase
             val isLoggedIn = auth.currentUser != null
+            var selectedFragmentTag = ""
+            var targetFragment: Fragment? = null
 
             when (item.itemId) {
                 R.id.nav_home -> {
-                    selectedFragment = if (isLoggedIn) LoggedInHomeFragment() else HomeFragment()
+                    targetFragment = if (isLoggedIn) loggedInHomeFragment else homeFragment
+                    selectedFragmentTag = "home"
+                }
+                R.id.nav_profile -> {
+                    if (!isLoggedIn) {
+                        showLoginPrompt()
+                    } else {
+                        targetFragment = profileFragment
+                        selectedFragmentTag = "profile"
+                    }
                 }
                 R.id.nav_categories -> {
                     if (!isLoggedIn) showLoginPrompt()
-                    // else selectedFragment = CategoriesFragment() // <-- FIX: Comentado hasta crear CategoriesFragment
-                    else Toast.makeText(this, "Categorías (requiere login)", Toast.LENGTH_SHORT).show() // Placeholder
+                    else Toast.makeText(this, "Categorías (requiere login)", Toast.LENGTH_SHORT).show()
                 }
                 R.id.nav_library -> {
                     if (!isLoggedIn) showLoginPrompt()
-                    // else selectedFragment = LibraryFragment() // <-- FIX: Comentado hasta crear LibraryFragment
-                    else Toast.makeText(this, "Mi Biblioteca (requiere login)", Toast.LENGTH_SHORT).show() // Placeholder
-                }
-                R.id.nav_profile -> {
-                    if (!isLoggedIn) showLoginPrompt()
-                    // else selectedFragment = ProfileFragment() // <-- FIX: Comentado hasta crear ProfileFragment
-                    else Toast.makeText(this, "Perfil (requiere login)", Toast.LENGTH_SHORT).show() // Placeholder
+                    else Toast.makeText(this, "Mi Biblioteca (requiere login)", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            if (selectedFragment != null) {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, selectedFragment)
-                    .commit()
+            if (targetFragment != null && targetFragment != activeFragment) {
+                val transaction = supportFragmentManager.beginTransaction()
+
+                if (supportFragmentManager.findFragmentByTag(selectedFragmentTag) != null) {
+                    transaction.hide(activeFragment).show(targetFragment)
+                } else {
+                    transaction.add(R.id.fragment_container, targetFragment, selectedFragmentTag).hide(activeFragment)
+                }
+
+                transaction.commit()
+                activeFragment = targetFragment
             }
             true
         }
     }
 
-    // Función auxiliar para pedir login (Ejemplo)
     private fun showLoginPrompt() {
-        Toast.makeText(this, "Inicia sesión para acceder a esta sección", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Inicia sesión para acceder", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, LoginActivity::class.java)
-        // Opcional: Podrías querer evitar añadir Login al historial si ya estás en Home
-        // intent.flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
         startActivity(intent)
     }
 }

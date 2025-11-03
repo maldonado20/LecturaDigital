@@ -9,19 +9,6 @@
     android:background="@color/fondo"
     tools:context=".HomeFragment">
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/etSearch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/search_bar_background"
-        android:hint="Buscar..."
-        android:maxLines="1"
-        android:inputType="text"
-        android:padding="14dp"
-        android:drawableStart="@drawable/ic_search"
-        android:drawablePadding="12dp"
-        android:layout_margin="16dp"
-        android:imeOptions="actionSearch" />
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -54,8 +54,18 @@ dependencies {
     //Retrofit - Gson
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Dependencias de Corutinas de Kotlin
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
 
     implementation("com.google.android.material:material:1.12.0")
+
+    // Dependencias de Lifecycle (para viewModelScope y lifecycleScope)
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3")
 
     //Librería de imagenes
     implementation("io.coil-kt:coil:2.6.0")

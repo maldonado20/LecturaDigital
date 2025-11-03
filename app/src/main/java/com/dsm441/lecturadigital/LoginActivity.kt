@@ -94,9 +94,11 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this, "Inicio de Sesión Exitoso", Toast.LENGTH_SHORT).show()
 
                     // Navegar a la pantalla principal asumiento que el login salio bien
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, HomeActivity::class.java)
+                    intent.putExtra("IS_LOGGED_IN", true)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
-                    finish() // destruimos la activida para que el usiario no pueda volver atras
+                    finish()
                 } else {
                     // Si el login falla damos un pequeño mensaje
                     Toast.makeText(
