@@ -75,8 +75,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Para recuperacion de contrasena -->
-
+        <!-- Recuperación de contraseña -->
         <TextView
             android:id="@+id/tvForgotPassword"
             android:layout_width="match_parent"
@@ -111,5 +110,16 @@
             android:textSize="16sp" />
 
     </LinearLayout>
+
+    <!-- LOADER CENTRADO (coincide con LoginActivity.kt) -->
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

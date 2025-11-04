@@ -12,9 +12,9 @@
         android:title="Categorías"/>
 
     <item
-        android:id="@+id/nav_library"
-        android:icon="@drawable/ic_library"
-        android:title="Mi Biblioteca"/>
+        android:id="@+id/nav_favorites"
+        android:icon="@drawable/ic_bookmark"
+        android:title="Favoritos"/>
 
     <item
         android:id="@+id/nav_profile"

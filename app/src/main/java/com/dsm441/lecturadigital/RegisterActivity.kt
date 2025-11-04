@@ -93,16 +93,16 @@ class RegisterActivity : AppCompatActivity() {
                         val user = hashMapOf(
                             "nombre" to nombre,
                             "email" to email,
-                            "progresoLectura" to hashMapOf<String, Any>(), // Mapa vacío para progreso
-                            "preferencias" to "", // Puedes poner valores default
-                            "favoritos" to listOf<String>() // Lista vacía para favoritos
+                            "progresoLectura" to hashMapOf<String, Any>(),
+                            "preferencias" to "",
+                            "favoritos" to listOf<String>()
                         )
 
                         // Guardamos el documento en Firestore
                         db.collection("Usuarios").document(userId)
                             .set(user)
                             .addOnSuccessListener {
-                                // ÉXITO: Auth y Firestore creados
+
                                 Toast.makeText(this, "Registro Exitoso", Toast.LENGTH_SHORT).show()
 
                                 // Navegar a Login Activity

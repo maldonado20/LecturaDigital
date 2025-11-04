@@ -1,10 +1,12 @@
 package com.dsm441.lecturadigital
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -18,13 +20,14 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+
 class HomeFragment : Fragment() {
 
     private lateinit var rvLibros: RecyclerView
     private lateinit var adaptadorLibros: BookAdapter
     private lateinit var pbCargando: ProgressBar
+    private lateinit var btnGoToLogin: Button
 
-    // Inicializamos la db
     private val db = Firebase.firestore
 
     override fun onCreateView(
@@ -35,6 +38,13 @@ class HomeFragment : Fragment() {
 
         rvLibros = view.findViewById(R.id.rvFeaturedBooks)
         pbCargando = view.findViewById(R.id.pbCargandoLibros)
+        btnGoToLogin = view.findViewById(R.id.btnGoToLogin_Home)
+
+        // Mostramos el botón de Login
+        btnGoToLogin.visibility = View.VISIBLE
+        btnGoToLogin.setOnClickListener {
+            startActivity(Intent(activity, LoginActivity::class.java))
+        }
 
 
         configurarRecyclerView()
@@ -47,34 +57,25 @@ class HomeFragment : Fragment() {
     }
 
     private fun configurarRecyclerView() {
-        // Inicializamos el adaptador con una lista vacía del nuevo tipo
-        adaptadorLibros = BookAdapter(emptyList())
+
+        adaptadorLibros = BookAdapter(emptyList(), isClickable = false)
         rvLibros.adapter = adaptadorLibros
         rvLibros.layoutManager = GridLayoutManager(requireContext(), 2)
     }
 
-    /**
-     * Llama a Firestore para obtener la lista de libros salvadoreños
-     */
+    //La función buscarLibrosDeFirestore
     private fun buscarLibrosDeFirestore() {
         pbCargando.visibility = View.VISIBLE
         rvLibros.visibility = View.GONE
-
-        // Usamos Corutinas para la llamada a Firestore
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             try {
-                // Hacemos la llamada a Firestore
                 val snapshot = db.collection("libros").get().await()
-
-                // Convertimos los documentos en nuestra lista de objetos
                 val listaLibros = snapshot.toObjects<LibroFirestore>()
-
                 if (listaLibros.isNotEmpty()) {
                     adaptadorLibros.updateBooks(listaLibros)
                 } else {
                     mostrarError("No se encontraron libros en Firestore")
                 }
-
             } catch (e: Exception) {
                 mostrarError("Error de red (Firestore): ${e.message}")
                 Log.e("HomeFragment", "Error al buscar en Firestore", e)

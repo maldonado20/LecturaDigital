@@ -1,117 +1,87 @@
 package com.dsm441.lecturadigital
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.dsm441.lecturadigital.data.LibroFirestore
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 
-
+// Esta es la actividad principal después del login.
+// Controla la navegación con la barra inferior y decide qué pantalla mostrar.
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-    private val homeFragment: HomeFragment by lazy { HomeFragment() }
-    private val loggedInHomeFragment: LoggedInHomeFragment by lazy { LoggedInHomeFragment() }
-    private val profileFragment: ProfileFragment by lazy { ProfileFragment() }
-
-    private lateinit var activeFragment: Fragment
+    private lateinit var bottomNavView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         auth = Firebase.auth
 
+        bottomNavView = findViewById(R.id.bottom_navigation)
+
+        // Esto se ejecuta solo la primera vez que se crea la actividad.
         if (savedInstanceState == null) {
-            val isLoggedIn = auth.currentUser != null
-            val initialFragment: Fragment
-
-            val isLoggedInIntent = intent.getBooleanExtra("IS_LOGGED_IN", false)
-
-            val bookToShow = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra("BOOK_TO_SHOW", LibroFirestore::class.java)
+            val isLoggedIn = auth.currentUser != null || intent.getBooleanExtra("IS_LOGGED_IN", false)
+            if (isLoggedIn) {
+                replaceFragment(LoggedInHomeFragment())
+                bottomNavView.visibility = View.VISIBLE
             } else {
-                @Suppress("DEPRECATION")
-                // FIX: Cambiado 'BookItem' por 'Book'
-                intent.getParcelableExtra<LibroFirestore>("BOOK_TO_SHOW")
+                replaceFragment(HomeFragment())
+                bottomNavView.visibility = View.GONE
             }
-
-            // (Ver "¡Ojo con este bug!" abajo)
-
-            if (isLoggedIn || isLoggedInIntent) { // <-- Lógica de login mejorada
-                if (bookToShow != null) {
-                    loggedInHomeFragment.arguments = Bundle().apply {
-                        // Esta línea ahora funciona
-                        putParcelable("FEATURED_BOOK", bookToShow)
-                    }
-                }
-                initialFragment = loggedInHomeFragment
-            } else {
-                initialFragment = homeFragment
-            }
-
-            activeFragment = initialFragment
-
-            supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container, initialFragment, "home")
-                .commit()
         }
 
         setupBottomNavigation()
     }
 
+    // Configura lo que pasa cuando tocas un icono de la barra de navegacion
     private fun setupBottomNavigation() {
-        val bottomNavView: BottomNavigationView = findViewById(R.id.bottom_navigation)
-
         bottomNavView.setOnItemSelectedListener { item ->
             val isLoggedIn = auth.currentUser != null
-            var selectedFragmentTag = ""
-            var targetFragment: Fragment? = null
+            var selectedFragment: Fragment? = null
 
             when (item.itemId) {
                 R.id.nav_home -> {
-                    targetFragment = if (isLoggedIn) loggedInHomeFragment else homeFragment
-                    selectedFragmentTag = "home"
+                    selectedFragment = if (isLoggedIn) LoggedInHomeFragment() else HomeFragment()
+                    bottomNavView.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
                 }
                 R.id.nav_profile -> {
-                    if (!isLoggedIn) {
-                        showLoginPrompt()
-                    } else {
-                        targetFragment = profileFragment
-                        selectedFragmentTag = "profile"
-                    }
+                    if (isLoggedIn) selectedFragment = ProfileFragment() else showLoginPrompt()
                 }
                 R.id.nav_categories -> {
-                    if (!isLoggedIn) showLoginPrompt()
-                    else Toast.makeText(this, "Categorías (requiere login)", Toast.LENGTH_SHORT).show()
+                    if (isLoggedIn) {
+
+                        Toast.makeText(this, "Categorías (en desarrollo)", Toast.LENGTH_SHORT).show()
+                    } else {
+                        showLoginPrompt()
+                    }
                 }
-                R.id.nav_library -> {
-                    if (!isLoggedIn) showLoginPrompt()
-                    else Toast.makeText(this, "Mi Biblioteca (requiere login)", Toast.LENGTH_SHORT).show()
+                R.id.nav_favorites -> {
+                    if (isLoggedIn) selectedFragment = FavoritesFragment() else showLoginPrompt()
                 }
             }
 
-            if (targetFragment != null && targetFragment != activeFragment) {
-                val transaction = supportFragmentManager.beginTransaction()
-
-                if (supportFragmentManager.findFragmentByTag(selectedFragmentTag) != null) {
-                    transaction.hide(activeFragment).show(targetFragment)
-                } else {
-                    transaction.add(R.id.fragment_container, targetFragment, selectedFragmentTag).hide(activeFragment)
-                }
-
-                transaction.commit()
-                activeFragment = targetFragment
+            if (selectedFragment != null) {
+                replaceFragment(selectedFragment)
             }
             true
         }
     }
 
+    // Esta función cambia la pantalla (el fragmento) que se muestra en el contenedor.
+    private fun replaceFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+    }
+
+    // Si el usuario no está logueado, le pedimos que inicie sesión.
     private fun showLoginPrompt() {
         Toast.makeText(this, "Inicia sesión para acceder", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, LoginActivity::class.java)

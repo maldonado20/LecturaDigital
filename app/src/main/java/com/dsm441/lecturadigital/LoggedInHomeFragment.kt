@@ -1,101 +1,88 @@
 package com.dsm441.lecturadigital
 
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.Button // <-- AÑADIDO
 import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import coil.load
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dsm441.lecturadigital.data.LibroFirestore
-import com.dsm441.lecturadigital.network.RetrofitClient
+import com.dsm441.lecturadigital.ui.BookAdapter
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class LoggedInHomeFragment : Fragment() {
 
-   private var LibroDestacado: LibroFirestore? = null
-
-    //las vistas
-    private lateinit var llFeaturedBook: LinearLayout
-    private lateinit var tvFeaturedBookTitle: TextView
-    private lateinit var ivFeaturedBookCover: ImageView
-    private lateinit var tvWelcomeMessage: TextView
+    private lateinit var rvLibros: RecyclerView
+    private lateinit var adaptadorLibros: BookAdapter
     private lateinit var pbCargando: ProgressBar
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        //recibir el libro enviado de HomeActivity
-        arguments?.let {
-            LibroDestacado = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-                it.getParcelable("FEATURED_BOOK", LibroFirestore::class.java)
-            }else {
-                @Suppress("DEPRECATION")
-                it.getParcelable("FEATURED_BOOK")
-            }
-        }
-    }
+    private val db = Firebase.firestore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_logged_in_home, container, false)
+        // Reutilizamos el layout del invitado
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        llFeaturedBook = view.findViewById(R.id.llFeaturedBook)
-        ivFeaturedBookCover = view.findViewById(R.id.ivFeaturedBookCover)
-        tvFeaturedBookTitle = view.findViewById(R.id.tvFeaturedBookTitle)
-        tvWelcomeMessage = view.findViewById(R.id.tvWelcomeMessage)
-        pbCargando = view.findViewById(R.id.pbCargandoLogin)
+        rvLibros = view.findViewById(R.id.rvFeaturedBooks)
+        pbCargando = view.findViewById(R.id.pbCargandoLibros)
 
-        LibroDestacado?.let { libro ->
-            mostrarLibrosDestacados(libro)
-        } ?: run {
-            pbCargando.visibility = View.GONE
-            tvWelcomeMessage.visibility = View.VISIBLE
-        }
-        return inflater.inflate(R.layout.fragment_logged_in_home, container, false)
+
+        // Ocultamos el botón de Login
+        val btnGoToLogin: Button = view.findViewById(R.id.btnGoToLogin_Home)
+        btnGoToLogin.visibility = View.GONE
+
+        configurarRecyclerView()
+        return view
     }
 
-    private fun mostrarLibrosDestacados(libro: LibroFirestore){
-        llFeaturedBook.visibility = View.VISIBLE
-        tvFeaturedBookTitle.text = libro.titulo
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        buscarLibrosDeFirestore()
+    }
 
-        tvFeaturedBookTitle.text = libro.titulo
+    private fun configurarRecyclerView() {
+        adaptadorLibros = BookAdapter(emptyList(), isClickable = true)
+        rvLibros.adapter = adaptadorLibros
+        rvLibros.layoutManager = GridLayoutManager(requireContext(), 2)
+    }
 
+    // (Las funciones buscarLibrosDeFirestore() y mostrarError() son
+    // idénticas a las de HomeFragment.kt)
+    private fun buscarLibrosDeFirestore() {
+        pbCargando.visibility = View.VISIBLE
+        rvLibros.visibility = View.GONE
         lifecycleScope.launch {
             try {
-                val query = "${libro.titulo} ${libro.autor}"
-                val response = RetrofitClient.apiService.searchBook(query)
-
-                if (response.isSuccessful) {
-                    val imageUrl = response.body()?.items?.firstOrNull()?.volumeInfo?.imageLinks?.thumbnail
-
-                    if (imageUrl != null) {
-                        ivFeaturedBookCover.load(imageUrl.replaceFirst("http://", "https://")) {
-                            crossfade(true)
-                            error(R.drawable.logo1)
-                        }
-                    } else {
-                        ivFeaturedBookCover.setImageResource(R.drawable.logo1)
-                    }
+                val snapshot = db.collection("libros").get().await()
+                val listaLibros = snapshot.toObjects<LibroFirestore>()
+                if (listaLibros.isNotEmpty()) {
+                    adaptadorLibros.updateBooks(listaLibros)
                 } else {
-                    ivFeaturedBookCover.setImageResource(R.drawable.logo1)
+                    mostrarError("No se encontraron libros en Firestore")
                 }
             } catch (e: Exception) {
-                Log.e("LoggedInHomeFragment", "Error al cargar portada", e)
-                ivFeaturedBookCover.setImageResource(R.drawable.logo1)
+                mostrarError("Error de red (Firestore): ${e.message}")
+                Log.e("LoggedInHomeFragment", "Error al buscar en Firestore", e)
             } finally {
-                // Ocultar ProgressBar y mostrar el libro
                 pbCargando.visibility = View.GONE
-                llFeaturedBook.visibility = View.VISIBLE
+                rvLibros.visibility = View.VISIBLE
             }
         }
     }
+
+    private fun mostrarError(mensaje: String) {
+        Toast.makeText(requireContext(), mensaje, Toast.LENGTH_LONG).show()
     }
+}
