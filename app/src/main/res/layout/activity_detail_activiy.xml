@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/fondo"
+    tools:context=".DetailActivity">
+
+    <ImageView
+        android:id="@+id/PortadaDetalle"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:scaleType="centerCrop"
+        android:src="@color/seccion"
+        android:contentDescription="Portada del libro" />
+
+    <TextView
+        android:id="@+id/TituloDetalle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Título del Libro"
+        android:textColor="@color/nav"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/AutorDetalle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Autor del Libro"
+        android:textColor="@color/buttom1"
+        android:textSize="18sp" />
+
+
+        <TextView
+            android:id="@+id/DescripcionDetalle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="Cargando descripción..."
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+
+    <Button
+        android:id="@+id/btnLeer"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="16dp"
+        android:background="@drawable/borde_primer_boton"
+        app:backgroundTint="@null"
+        android:text="Empezar a Leer"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+</LinearLayout>
