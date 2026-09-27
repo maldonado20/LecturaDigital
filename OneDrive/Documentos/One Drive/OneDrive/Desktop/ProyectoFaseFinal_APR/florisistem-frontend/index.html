@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloriSistem - Tu Floristería Digital</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f9f6f0; color: #333; }
+        header { background-color: #4a6b52; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; }
+        .barra-login { background-color: #2b3e30; padding: 10px; text-align: right; color: white; font-size: 14px; }
+        .barra-login input { padding: 4px 8px; margin-left: 5px; border: none; border-radius: 3px; color: #333; }
+        .btn-login { background-color: #4a6b52; color: white; border: none; padding: 4px 12px; margin-left: 5px; cursor: pointer; border-radius: 3px; font-weight: bold; }
+        .btn-login:hover { background-color: #3b5440; }
+        nav { background-color: #3b5440; padding: 10px; text-align: center; display: none; }
+        nav.visible { display: block; }
+        nav button { background-color: transparent; border: 1px solid white; color: white; padding: 8px 15px; margin: 0 5px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        nav button:hover { background-color: white; color: #3b5440; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: none; }
+        .container.visible { display: block; }
+        .seccion { display: none; }
+        .seccion.activa { display: block; }
+        .flex-personalizador { display: flex; gap: 30px; flex-wrap: wrap; margin-top: 20px; }
+        .formulario-pedido { flex: 1; min-width: 300px; background: #fffdf9; padding: 20px; border: 1px solid #e2dcd5; border-radius: 6px; }
+        .resumen-precio { flex: 1; min-width: 300px; background: #f4efe6; padding: 20px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; }
+        .campo { margin-bottom: 15px; }
+        .campo label { display: block; font-weight: bold; margin-bottom: 5px; }
+        .campo input, .campo textarea, .campo select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .precio-grande { font-size: 36px; color: #4a6b52; font-weight: bold; text-align: center; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #e2dcd5; padding: 12px; text-align: left; }
+        th { background-color: #f4efe6; }
+        .badge { display: inline-block; padding: 5px 10px; font-size: 12px; border-radius: 12px; font-weight: bold; }
+        .btn-principal { background-color: #4a6b52; color: white; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-principal:hover { background-color: #3b5440; }
+        .mensaje-bienvenida { text-align: center; margin-top: 50px; font-size: 18px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="barra-login" id="bloque-login">
+        <span id="txt-usuario-activo">Identifícate para ingresar: </span>
+        <input type="email" id="login-email" placeholder="Correo">
+        <input type="password" id="login-pass" placeholder="Contraseña">
+        <button class="btn-login" onclick="procesarLogin()">Entrar</button>
+    </div>
+    <header>🌸 FloriSistem 🌸</header>
+    <nav id="menu-navegacion">
+        <button id="btn-nav-cliente" onclick="mostrarSeccion('cliente')">🛒 Vista Cliente (Personalizador)</button>
+        <button id="btn-nav-pedidos" onclick="mostrarSeccion('admin-pedidos')">📋 Admin (Pedidos)</button>
+        <button id="btn-nav-inventario" onclick="mostrarSeccion('admin-inventario')">📦 Admin (Inventario)</button>
+    </nav>
+    <div id="aviso-bloqueado" class="mensaje-bienvenida">
+        <h2>Bienvenido a FloriSistem</h2>
+        <p>Por favor, inicia sesión en la barra superior con tus credenciales de prueba para acceder al sistema.</p>
+    </div>
+    <div class="container" id="contenedor-principal">
+        <div id="seccion-cliente" class="seccion">
+            <h2>Personalizador Floral Dinámico</h2>
+            <p>Diseña tu arreglo eligiendo los componentes. El precio se calculará en tiempo real.</p>
+            <div class="flex-personalizador">
+                <div class="formulario-pedido">
+                    <h3>1. Datos de Entrega</h3>
+                    <div class="campo">
+                        <label>Nombre de quien recibe:</label>
+                        <input type="text" id="nombreReceptor" placeholder="Ej. Maria Gomez" required>
+                    </div>
+                    <div class="campo">
+                        <label>Teléfono de contacto:</label>
+                        <input type="text" id="telefonoReceptor" placeholder="Ej. +50377777777" required>
+                    </div>
+                    <div class="campo">
+                        <label>Dirección exacta de entrega:</label>
+                        <textarea id="direccionEntrega" rows="2" placeholder="Calle, número de casa, colonia..." required></textarea>
+                    </div>
+                    <div class="campo">
+                        <label>Fecha de entrega:</label>
+                        <input type="date" id="fechaEntrega" required>
+                    </div>
+                    <div class="campo">
+                        <label>Hora aproximada:</label>
+                        <input type="time" id="horaEntrega" value="12:00" required>
+                    </div>
+                    <div class="campo">
+                        <label>Dedicatoria en la tarjeta (Opcional):</label>
+                        <textarea id="dedicatoria" rows="2" placeholder="Escribe tu mensaje aquí..."></textarea>
+                    </div>
+                </div>
+                <div class="resumen-precio">
+                    <div>
+                        <h3>2. Componentes del Arreglo</h3>
+                        <div class="campo">
+                            <label>Rosas Rojas ($1.50 c/u):</label>
+                            <input type="number" id="cant-rosas" value="0" min="0" oninput="calcularPrecioEnPantalla()">
+                        </div>
+                        <div class="campo">
+                            <label>Girasoles ($2.50 c/u):</label>
+                            <input type="number" id="cant-girasoles" value="0" min="0" oninput="calcularPrecioEnPantalla()">
+                        </div>
+                        <div class="campo">
+                            <label>Papel Kraft ($0.80 c/u):</label>
+                            <input type="number" id="cant-kraft" value="0" min="0" oninput="calcularPrecioEnPantalla()">
+                        </div>
+                        <div class="campo">
+                            <label>Cinta Satinada ($0.50 c/u):</label>
+                            <input type="number" id="cant-cinta" value="0" min="0" oninput="calcularPrecioEnPantacle()">
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="text-align: center; margin-bottom: 0;">Precio Total Estimado</h3>
+                        <div class="precio-grande" id="precio-total-pantalla">$0.00</div>
+                        <button class="btn-principal" onclick="enviarPedido()">💐 Confirmar y Enviar Pedido</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="seccion-admin-pedidos" class="seccion">
+            <h2>Panel Administrativo - Control de Pedidos</h2>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Receptor</th><th>Dirección de Entrega</th><th>Precio Total</th><th>Estado Actual</th></tr>
+                </thead>
+                <tbody id="tabla-pedidos-admin">
+                    <tr><td colspan="5">Cargando pedidos...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="seccion-admin-inventario" class="seccion">
+            <h2>Control de Inventario (Existencias)</h2>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Nombre del Insumo</th><th>Tipo</th><th>Existencias Disponibles</th><th>Precio Unitario</th></tr>
+                </thead>
+                <tbody id="tabla-inventario-admin">
+                    <tr><td colspan="5">Cargando inventario...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        const API_URL = "http://localhost:8080/api";
+        let usuarioLogueado = null;
+
+        async function procesarLogin() {
+            const emailInput = document.getElementById('login-email').value.trim();
+            const contrasenaInput = document.getElementById('login-pass').value.trim();
+            if(!emailInput || !contrasenaInput) {
+                alert("Por favor, ingresa tu correo y contraseña.");
+                return;
+            }
+            try {
+                const respuesta = await fetch(`${API_URL}/usuarios/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInput, contrasena: contrasenaInput })
+                });
+                if(respuesta.ok) {
+                    usuarioLogueado = await respuesta.json();
+                    alert("¡Bienvenido/a " + usuarioLogueado.nombre + "! Has ingresado con el rol de " + usuarioLogueado.rol + ".");
+                    document.getElementById('bloque-login').innerHTML = "<div><span>Sesión activa: <strong>" + usuarioLogueado.nombre + " (" + usuarioLogueado.rol + ")</strong></span><button class='btn-login' onclick='window.location.reload()'>Salir</button></div>";
+                    document.getElementById('aviso-bloqueado').style.display = 'none';
+                    document.getElementById('menu-navegacion').classList.add('visible');
+                    document.getElementById('contenedor-principal').classList.add('visible');
+                    if(usuarioLogueado.rol === "ADMIN") {
+                        document.getElementById('btn-nav-pedidos').style.display = 'inline-block';
+                        document.getElementById('btn-nav-inventario').style.display = 'inline-block';
+                        mostrarSeccion('admin-pedidos');
+                    } else {
+                        document.getElementById('btn-nav-pedidos').style.display = 'none';
+                        document.getElementById('btn-nav-inventario').style.display = 'none';
+                        mostrarSeccion('cliente');
+                    }
+                } else {
+                    alert("Credenciales incorrectas. Verifica el correo y la contraseña.");
+                }
+            } catch (error) {
+                console.error("Error al conectar:", error);
+                alert("No se pudo conectar con el servidor backend.");
+            }
+        }
+
+        function mostrarSeccion(idSeccion) {
+            document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('activa'));
+            document.getElementById("seccion-" + idSeccion).classList.add('activa');
+            if (idSeccion === 'cliente' || idSeccion === 'admin-inventario') cargarInventarioTabla();
+            if (idSeccion === 'admin-pedidos') cargarPedidos();
+        }
+
+        function calcularPrecioEnPantalla() {
+            const rosas = parseInt(document.getElementById('cant-rosas').value) || 0;
+            const girasoles = parseInt(document.getElementById('cant-girasoles').value) || 0;
+            const kraft = parseInt(document.getElementById('cant-kraft').value) || 0;
+            const cinta = parseInt(document.getElementById('cant-cinta').value) || 0;
+            const total = (rosas * 1.50) + (girasoles * 2.50) + (kraft * 0.80) + (cinta * 0.50);
+            document.getElementById('precio-total-pantalla').innerText = "$" + total.toFixed(2);
+        }
+
+        async function cargarInventarioTabla() {
+            try {
+                const respuesta = await fetch(`${API_URL}/insumos`);
+                const insumos = await respuesta.json();
+                let htmlAdmin = "";
+                insumos.forEach(ins => {
+                    htmlAdmin += "<tr><td>" + ins.id + "</td><td>" + ins.nombre + "</td><td>" + ins.tipo + "</td><td><strong>" + ins.cantidadDisponible + " unidades</strong></td><td>$" + ins.precioUnitario.toFixed(2) + "</td></tr>";
+                });
+                document.getElementById("tabla-inventario-admin").innerHTML = htmlAdmin;
+            } catch (error) {
+                console.error("Error al cargar inventario:", error);
+            }
+        }
+
+               // Cargar Pedidos en la tabla de administración con botón de cambio de estado
+        async function cargarPedidos() {
+            try {
+                const respuesta = await fetch(`${API_URL}/pedidos`);
+                const pedidos = await respuesta.json();
+                
+                let htmlPedidos = "";
+                if(pedidos.length === 0) {
+                    htmlPedidos = "<tr><td colspan='5' style='text-align:center;'>No hay pedidos registrados</td></tr>";
+                } else {
+                    pedidos.forEach(ped => {
+                        // Determinamos el siguiente estado lógico
+                        let siguienteEstado = "";
+                        if (ped.estado === "PENDIENTE") siguienteEstado = "PREPARACION";
+                        else if (ped.estado === "PREPARACION") siguienteEstado = "EN RUTA";
+                        else if (ped.estado === "EN RUTA") siguienteEstado = "ENTREGADO";
+
+                        // Si ya está entregado, no mostramos botón
+                        let botonAccion = siguienteEstado 
+                            ? `<button class="btn-accion" onclick="cambiarEstadoReal(${ped.id}, '${siguienteEstado}')">➡️ Pasar a ${siguienteEstado}</button>` 
+                            : `✅ Finalizado`;
+
+                        htmlPedidos += `
+                            <tr>
+                                <td>#00${ped.id}</td>
+                                <td>${ped.nombreReceptor}</td>
+                                <td>${ped.direccionEntrega}</td>
+                                <td><strong>$${ped.precioTotal.toFixed(2)}</strong></td>
+                                <td>
+                                    <span class="badge" style="background-color: #ffe3e3; color: #c94c4c; margin-right: 10px;">${ped.estado}</span>
+                                    ${botonAccion}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+                document.getElementById("tabla-pedidos-admin").innerHTML = htmlPedidos;
+            } catch (error) {
+                console.error("Error al cargar pedidos:", error);
+            }
+        }
+                // Cambiar el estado del pedido de forma natural conectando al Backend Java
+        async function cambiarEstadoReal(idPedido, nuevoEstado) {
+            try {
+                const respuesta = await fetch(`${API_URL}/pedidos/${idPedido}/estado`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevoEstado)
+                });
+
+                if(respuesta.ok) {
+                    alert(`¡Estado del pedido #00${idPedido} actualizado a ${nuevoEstado}!`);
+                    cargarPedidos(); // Recargamos la tabla automáticamente para ver el cambio
+                } else {
+                    alert("Error en el servidor al actualizar el estado.");
+                }
+            } catch (error) {
+                console.error("Error al cambiar estado:", error);
+                alert("No se pudo conectar con el servidor backend.");
+            }
+        }
+
+
+
+        async function enviarPedido() {
+            const nombre = document.getElementById('nombreReceptor').value;
+            const telefono = document.getElementById('telefonoReceptor').value;
+            const direccion = document.getElementById('direccionEntrega').value;
+            const fecha = document.getElementById('fechaEntrega').value;
+            const hora = document.getElementById('horaEntrega').value;
+            const dedicatoria = document.getElementById('dedicatoria').value;
+            if(!nombre || !telefono || !direccion || !fecha) {
+                alert("Por favor, completa todos los campos de entrega requeridos.");
+                return;
+            }
+            const items = [];
+            if (parseInt(document.getElementById('cant-rosas').value) > 0) 
+                items.push({ insumoId: 1, cantidad: parseInt(document.getElementById('cant-rosas').value) });
+            if (parseInt(document.getElementById('cant-girasoles').value) > 0) 
+                items.push({ insumoId: 2, cantidad: parseInt(document.getElementById('cant-girasoles').value) });
+            if (parseInt(document.getElementById('cant-kraft').value) > 0) 
+                items.push({ insumoId: 3, cantidad: parseInt(document.getElementById('cant-kraft').value) });
+            if (parseInt(document.getElementById('cant-cinta').value) > 0) 
+                items.push({ insumoId: 4, cantidad: parseInt(document.getElementById('cant-cinta').value) });
+            if(items.length === 0) {
+                alert("Debes agregar al menos una flor o insumo a tu arreglo.");
+                return;
+            }
+            const datosPedido = {
+                nombreReceptor: nombre,
+                telefonoReceptor: telefono,
+                direccionEntrega: direccion,
+                fechaEntrega: fecha,
+                horaEntrega: hora + ":00",
+                dedicatoria: dedicatoria,
+                items: items
+            };
+            try {
+                const respuesta = await fetch(`${API_URL}/pedidos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosPedido)
+                });
+                if(respuesta.ok) {
+                    alert("¡💐 Pedido creado con éxito! Los insumos han sido descontados del inventario.");
+                    document.getElementById('nombreReceptor').value = "";
+                    document.getElementById('telefonoReceptor').value = "";
+                    document.getElementById('direccionEntrega').value = "";
+                    document.getElementById('dedicatoria').value = "";
+                    document.getElementById('cant-rosas').value = "0";
+                    document.getElementById('cant-girasoles').value = "0";
+                    document.getElementById('cant-kraft').value = "0";
+                    document.getElementById('cant-cinta').value = "0";
+                    calcularPrecioEnPantalla();
+                } else {
+                    alert("Error en el servidor al procesar el pedido.");
+                }
+            } catch (error) {
+                console.error("Error al enviar el pedido:", error);
+                alert("No se pudo conectar con el servidor backend.");
+            }
+        }
+
+        window.onload = function() {
+            // Carga inicial pasiva
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+POST http://localhost:8080/api/pedidos
+Content-Type: application/json
+
+{
+  "nombreReceptor": "Maria Gomez",
+  "telefonoReceptor": "+50377777777",
+  "direccionEntrega": "Calle Las Flores, Bloque C, Casa 12",
+  "fechaEntrega": "2026-10-31",
+  "horaEntrega": "14:30:00",
+  "dedicatoria": "¡Feliz cumpleaños con mucho amor!",
+  "items": [
+    {
+      "insumoId": 1,
+      "cantidad": 12
+    },
+    {
+      "insumoId": 4,
+      "cantidad": 1
+    }
+  ]
+}
